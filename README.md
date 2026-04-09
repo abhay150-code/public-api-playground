@@ -29,15 +29,15 @@ To test all APIs locally, please use a local development server (e.g., **Live Se
 2. I have already created a `config-local.js` for you with your current key.
 3. This file is listed in `.gitignore`, so it will **never be pushed to GitHub**.
 
-#### Production Setup (Netlify / Vercel)
+#### Production Setup (Vercel / Netlify / Linux)
 Since this is a vanilla site without a build tool like Vite, we use **Build-Time Injection**:
 1. Go to your site's **Environment Variables** dashboard.
 2. Add a variable named `NINJAS_API_KEY` with your real API key.
-3. Change your **Build Command** to the following:
+3. Change your **Build Command** to the following (Linux compatible):
    ```bash
-   sed -i '' "s/__NINJAS_API_KEY__/$NINJAS_API_KEY/g" script.js
+   sed -i "s/__NINJAS_API_KEY__/$NINJAS_API_KEY/g" script.js
    ```
-   *Note: If you are on a Linux-based builder (common on Netlify), use `sed -i` instead of `sed -i ''`.*
+   *(Note: This command replaces the placeholder with your actual key during deployment).*
 4. Set the **Publish Directory** to `.` (or leave it blank).
 
 ### Deployment
