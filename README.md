@@ -19,13 +19,6 @@ A modern, responsive dashboard to explore various public APIs. Built with HTML, 
 ### Local Development
 To test all APIs locally, please use a local development server (e.g., **Live Server** extension in VS Code or `npx serve`) instead of opening `index.html` directly in the browser. This avoids **CORS** restrictions.
 
-### API Keys
-This project uses the provided API key for **API Ninjas**. If you need to change it, update the `API_CONFIG` object in `script.js`:
-```js
-const API_CONFIG = {
-    NINJAS_API_KEY: 'YOUR_API_KEY_HERE',
-};
-```
 
 ### Deployment
 This project is ready for one-click deployment to **Netlify** or **Vercel**. Simply upload the `index.html`, `style.css`, and `script.js` files.
