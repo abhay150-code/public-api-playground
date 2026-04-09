@@ -4,8 +4,10 @@
  */
 
 // --- CONFIGURATION & API KEYS ---
+// NOTE: For local testing without a build tool like Vite, you can put your key here.
+// For production, set these in your deployment dashboard (Netlify/Vercel) or use a .env file with a bundler.
 const API_CONFIG = {
-    NINJAS_API_KEY: 'Ez7FBgQY5Sx3asdaQGsGUftjwT7T4UwZHdNEwNgn', // Provided by user
+    NINJAS_API_KEY: 'YOUR_API_KEY_HERE', // Move this to YOUR_API_KEY_HERE and set up .env
 };
 
 // --- UTILITY FUNCTIONS ---
