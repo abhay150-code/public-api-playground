@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public API Playground</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Public API Playground</h1>
+            <p>Explore and test multiple public APIs with just a click!</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="api-grid">
+            <!-- Card 1: Dog Finder -->
+            <section class="api-card" id="dog-card">
+                <div class="card-header">
+                    <h2>Dog Finder</h2>
+                </div>
+                <div class="card-body">
+                    <div id="dog-output" class="output-area">
+                        <p class="placeholder">Click "Get Dog" to see a furry friend!</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn primary" onclick="getDog()">Get Dog</button>
+                    <button id="copy-dog" class="btn secondary hidden" onclick="copyToClipboard('dog-img-url')">Copy URL</button>
+                </div>
+                <div class="loader hidden"></div>
+                <div class="error-msg hidden"></div>
+            </section>
+
+            <!-- Card 2: QR Code Generator (API Ninjas) -->
+            <section class="api-card" id="qrcode-card">
+                <div class="card-header">
+                    <h2>QR Code Generator</h2>
+                </div>
+                <div class="card-body">
+                    <div id="qrcode-output" class="output-area">
+                        <p class="placeholder">Enter text or URL to generate a QR.</p>
+                    </div>
+                </div>
+                <div class="card-footer-ai">
+                    <input type="text" id="qrcode-input" placeholder="Enter URL or text..." class="prompt-input">
+                    <button class="btn primary" onclick="generateQRCode()">Generate QR</button>
+                    <button id="copy-qrcode" class="btn secondary hidden" onclick="copyToClipboard('qrcode-img-url')">Copy URL</button>
+                </div>
+                <div class="loader hidden"></div>
+                <div class="error-msg hidden"></div>
+            </section>
+
+            <!-- Card 3: Random User Profile -->
+            <section class="api-card" id="user-card">
+                <div class="card-header">
+                    <h2>Random User Profile</h2>
+                </div>
+                <div class="card-body">
+                    <div id="user-output" class="output-area">
+                        <p class="placeholder">Generate a random persona.</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn primary" onclick="getUser()">Get User</button>
+                </div>
+                <div class="loader hidden"></div>
+                <div class="error-msg hidden"></div>
+            </section>
+
+            <!-- Card 4: Joke Generator -->
+            <section class="api-card" id="joke-card">
+                <div class="card-header">
+                    <h2>Joke Generator</h2>
+                </div>
+                <div class="card-body">
+                    <div id="joke-output" class="output-area">
+                        <p class="placeholder">Need a laugh?</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn primary" onclick="getJoke()">Get Joke</button>
+                </div>
+                <div class="loader hidden"></div>
+                <div class="error-msg hidden"></div>
+            </section>
+
+            <!-- Card 5: Emoji Finder (API Ninjas) -->
+            <section class="api-card" id="emoji-card">
+                <div class="card-header">
+                    <h2>Emoji Finder</h2>
+                </div>
+                <div class="card-body">
+                    <div id="emoji-output" class="output-area">
+                        <p class="placeholder">Search for an emoji.</p>
+                    </div>
+                </div>
+                <div class="card-footer-ai">
+                    <input type="text" id="emoji-input" placeholder="smile, happy, heart..." class="prompt-input">
+                    <button class="btn primary" onclick="getEmoji()">Search Emoji</button>
+                </div>
+                <div class="loader hidden"></div>
+                <div class="error-msg hidden"></div>
+            </section>
+
+            <!-- Card 6: Animal Finder (API Ninjas) -->
+            <section class="api-card" id="animal-card">
+                <div class="card-header">
+                    <h2>Animal Finder</h2>
+                </div>
+                <div class="card-body">
+                    <div id="animal-output" class="output-area">
+                        <p class="placeholder">Learn about any animal!</p>
+                    </div>
+                </div>
+                <div class="card-footer-ai">
+                    <input type="text" id="animal-input" placeholder="Enter animal name (e.g. Cheetah)" class="prompt-input">
+                    <button class="btn primary" onclick="getAnimal()">Search Animal</button>
+                </div>
+                <div class="loader hidden"></div>
+                <div class="error-msg hidden"></div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Public API Playground. Built with HTML, CSS, and Vanilla JS.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
