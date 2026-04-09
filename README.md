@@ -24,21 +24,21 @@ To test all APIs locally, please use a local development server (e.g., **Live Se
 > [!CAUTION]
 > **Secret Rotation Required**: Your API key was previously committed to GitHub history. To ensure your account is secure, please **rotate your API key** in the [API Ninjas Dashboard](https://api-ninjas.com/profile) and update your `.env` file with the new one.
 
-#### Local Setup
-1. Create a `.env` file in the root directory (already created for you).
-2. Add your keys:
-   ```env
-   NINJAS_API_KEY=your_new_key_here
-   ```
-3. Since this is a vanilla JavaScript project, browser-side code cannot natively read `.env` files. For local testing, you can temporarily add your key to `script.js`, but **do not commit it**.
-4. For production (Netlify/Vercel), add `NINJAS_API_KEY` to your environment variables in the site settings dashboard.
+#### Local Setup (Development)
+1. The project now uses an optional `config-local.js` file for local testing.
+2. I have already created a `config-local.js` for you with your current key.
+3. This file is listed in `.gitignore`, so it will **never be pushed to GitHub**.
 
-#### Using with a Bundler (Recommended)
-If you want to use the `.env` file locally, consider adding **Vite** to this project:
-```bash
-npm create vite@latest ./ --template vanilla
-```
-Vite will automatically load variables prefixed with `VITE_` and make them available via `import.meta.env`.
+#### Production Setup (Netlify / Vercel)
+Since this is a vanilla site without a build tool like Vite, we use **Build-Time Injection**:
+1. Go to your site's **Environment Variables** dashboard.
+2. Add a variable named `NINJAS_API_KEY` with your real API key.
+3. Change your **Build Command** to the following:
+   ```bash
+   sed -i '' "s/__NINJAS_API_KEY__/$NINJAS_API_KEY/g" script.js
+   ```
+   *Note: If you are on a Linux-based builder (common on Netlify), use `sed -i` instead of `sed -i ''`.*
+4. Set the **Publish Directory** to `.` (or leave it blank).
 
 ### Deployment
 This project is ready for one-click deployment to **Netlify** or **Vercel**. Simply upload the `index.html`, `style.css`, and `script.js` files.

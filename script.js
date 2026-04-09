@@ -4,10 +4,10 @@
  */
 
 // --- CONFIGURATION & API KEYS ---
-// NOTE: For local testing without a build tool like Vite, you can put your key here.
-// For production, set these in your deployment dashboard (Netlify/Vercel) or use a .env file with a bundler.
+// Deployment: The __NINJAS_API_KEY__ placeholder is replaced by the build command in Netlify/Vercel.
+// Local: Use a config-local.js file (already in .gitignore) to set window.LOCAL_CONFIG.
 const API_CONFIG = {
-    NINJAS_API_KEY: 'YOUR_API_KEY_HERE', // Move this to YOUR_API_KEY_HERE and set up .env
+    NINJAS_API_KEY: (window.LOCAL_CONFIG && window.LOCAL_CONFIG.NINJAS_API_KEY) || '__NINJAS_API_KEY__',
 };
 
 // --- UTILITY FUNCTIONS ---
