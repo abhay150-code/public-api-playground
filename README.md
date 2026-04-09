@@ -1,49 +1,57 @@
-# Public API Playground
+# Public API Playground 🚀
 
-A modern, responsive dashboard to explore various public APIs. Built with HTML, CSS, and Vanilla JavaScript.
+A sleek, minimalistic, and modern web application designed to explore and test various public APIs. Built with a focus on simplicity, premium aesthetics, and pure Vanilla JavaScript.
 
-## 🚀 Features
-- **6 Integrated APIs**: 
-  - **Dog Finder**: Random dog images and breeds.
-  - **Random Image**: Random high-quality images from API Ninjas.
-  - **Random User**: Detailed random persona profiles.
-  - **Joke Generator**: Random jokes to brighten your day.
-  - **Emoji Finder**: Search for any emoji by name.
-  - **Animal Finder**: Search for detailed animal taxonomy and facts.
-- **Modern UI**: Clean cards, responsive grid, and smooth animations.
-- **Interactive Elements**: Copy-to-clipboard buttons and dynamic fetching.
-- **Robust Logic**: Async/Await fetch calls with loading spinners and error handling.
+![Minimalistic UI](https://img.shields.io/badge/Design-Minimalistic-blue.svg)
+![Technology-HTML5-orange.svg](https://img.shields.io/badge/Technology-HTML5-orange.svg)
+![Technology-CSS3-blue.svg](https://img.shields.io/badge/Technology-CSS3-blue.svg)
+![Technology-JavaScript-yellow.svg](https://img.shields.io/badge/Technology-JavaScript-yellow.svg)
 
-## 🛠️ Setup & Deployment
+## ✨ Features
 
-### Local Development
-To test all APIs locally, please use a local development server (e.g., **Live Server** extension in VS Code or `npx serve`) instead of opening `index.html` directly in the browser. This avoids **CORS** restrictions.
+- **Random Dog Explorer**: Fetch and view random images of various dog breeds.
+- **Daily Jokes**: Get a quick laugh with jokes fetched from the JokeAPI.
+- **User Generator**: Generate random user profiles with avatars and contact details.
+- **Anime Finder**: Discover random anime titles, posters, and synopses.
+- **Emoji Hub**: Instantly find and display random emojis.
+- **Food Gallery**: Explore gourmet dishes and categories.
+- **Minimalistic UI**: Crisp light-themed interface with smooth transitions and responsive design.
+- **Skeleton Screens**: Premium loading experiences for every API fetch.
 
-### API Keys & Security
+## 🛠️ Technology Stack
 
-> [!CAUTION]
-> **Secret Rotation Required**: Your API key was previously committed to GitHub history. To ensure your account is secure, please **rotate your API key** in the [API Ninjas Dashboard](https://api-ninjas.com/profile) and update your `.env` file with the new one.
+- **Core**: HTML5, CSS3 (Vanilla), JavaScript (ES6+)
+- **Icons**: [Lucide](https://lucide.dev/)
+- **Typography**: [Inter](https://rsms.me/inter/) font family
+- **Deployment**: Optimized for standard static hosting
 
-#### Local Setup (Development)
-1. The project now uses an optional `config-local.js` file for local testing.
-2. I have already created a `config-local.js` for you with your current key.
-3. This file is listed in `.gitignore`, so it will **never be pushed to GitHub**.
+## 🚀 Getting Started
 
-#### Production Setup (Vercel / Netlify / Linux)
-Since this is a vanilla site without a build tool like Vite, we use **Build-Time Injection**:
-1. Go to your site's **Environment Variables** dashboard.
-2. Add a variable named `NINJAS_API_KEY` with your real API key.
-3. Change your **Build Command** to the following (Linux compatible):
+To run this project locally, follows these simple steps:
+
+1. **Clone the repository**:
    ```bash
-   sed -i "s/__NINJAS_API_KEY__/$NINJAS_API_KEY/g" script.js
+   git clone https://github.com/abhay150-code/Public-API-Playground.git
    ```
-   *(Note: This command replaces the placeholder with your actual key during deployment).*
-4. Set the **Publish Directory** to `.` (or leave it blank).
 
-### Deployment
-This project is ready for one-click deployment to **Netlify** or **Vercel**. Simply upload the `index.html`, `style.css`, and `script.js` files.
+2. **Open index.html**:
+   Simply open the `index.html` file in your preferred browser.
+   
+   *Tip: For the best experience, use a development server like **Live Server** in VS Code.*
 
-## 📂 File Structure
-- `index.html`: Main layout and structure.
-- `style.css`: Modern design system and responsiveness.
-- `script.js`: API fetching logic and UI updates.
+## 📂 Project Structure
+
+```text
+├── index.html   # Main application structure
+├── style.css    # Minimalistic design system & styles
+├── script.js    # API integration & UI logic
+└── .env         # Environment variables (if applicable)
+```
+
+## 📝 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+Built with ❤️ by [abhay150-code](https://github.com/abhay150-code)

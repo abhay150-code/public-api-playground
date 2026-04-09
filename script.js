@@ -1,227 +1,314 @@
 /**
- * Public API Playground - Main Logic
- * Using fetch() with async/await, error handling, and loading states.
+ * Public API Playground - Logic
+ * 🚀 Vanilla JavaScript | Standard APIs, Anime, Emoji & Food
  */
 
-// --- CONFIGURATION & API KEYS ---
-// Deployment: The __NINJAS_API_KEY__ placeholder is replaced by the build command in Netlify/Vercel.
-// Local: Use a config-local.js file (already in .gitignore) to set window.LOCAL_CONFIG.
-const API_CONFIG = {
-    NINJAS_API_KEY: (window.LOCAL_CONFIG && window.LOCAL_CONFIG.NINJAS_API_KEY) || '__NINJAS_API_KEY__',
+// --- Global Constants & State ---
+const API_URLS = {
+    dog: 'https://dog.ceo/api/breeds/image/random',
+    joke: 'https://v2.jokeapi.dev/joke/Any?safe-mode',
+    user: 'https://randomuser.me/api/',
+    anime: 'https://api.jikan.moe/v4/random/anime',
+    emoji: 'https://emojihub.yurace.pro/api/random',
+    food: 'https://foodish-api.com/api/'
 };
 
-// --- UTILITY FUNCTIONS ---
+// --- Initialization ---
+window.addEventListener('load', () => {
+    initApp();
+});
+
+function initApp() {
+    checkProtocol();
+
+    // Fetch initial data
+    fetchDog();
+    fetchJoke();
+    fetchUser();
+    fetchAnime();
+    fetchEmoji();
+    fetchFood();
+
+    // Event Listeners
+    setupEventListeners();
+}
 
 /**
- * Generic fetch helper with loading and error state management
- * @param {string} url - The API endpoint
- * @param {string} cardId - The ID prefix for the card UI elements
- * @param {object} options - Fetch options (headers, methods, etc.)
- * @param {boolean} isBlob - Whether to treat response as a blob
+ * Warns the user if they are using file:// which blocks some API requests
  */
-async function fetchData(url, cardId, options = {}, isBlob = false) {
-    const outputElement = document.getElementById(`${cardId}-output`);
-    const loader = document.querySelector(`#${cardId}-card .loader`);
-    const errorMsg = document.querySelector(`#${cardId}-card .error-msg`);
+function checkProtocol() {
+    if (window.location.protocol === 'file:') {
+        const header = document.querySelector('.header');
+        const warning = document.createElement('div');
+        warning.style.cssText = `
+            margin: -2rem auto 3rem;
+            padding: 0.75rem 1rem;
+            background: #fef2f2;
+            border: 1px solid #fee2e2;
+            border-radius: 8px;
+            color: #b91c1c;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        `;
+        warning.className = 'animate-in';
+        warning.innerHTML = `
+            <i data-lucide="alert-circle" style="width:16px;height:16px;"></i>
+            <span>Running from a local file. Use <strong>Live Server</strong> for full feature support.</span>
+        `;
+        header.insertAdjacentElement('afterend', warning);
+        refreshIcons();
+    }
+}
 
-    // Reset UI state
-    loader.classList.remove('hidden');
-    errorMsg.classList.add('hidden');
-    outputElement.style.opacity = '0.3';
+function setupEventListeners() {
+    // Standard APIs
+    document.getElementById('refresh-dog').addEventListener('click', () => fetchDog());
+    document.getElementById('copy-dog-url').addEventListener('click', copyDogURL);
+    document.getElementById('refresh-joke').addEventListener('click', () => fetchJoke());
+    document.getElementById('refresh-user').addEventListener('click', () => fetchUser());
+    document.getElementById('refresh-user-btn').addEventListener('click', () => fetchUser());
+    
+    // Anime & Emoji
+    document.getElementById('refresh-anime').addEventListener('click', () => fetchAnime());
+    document.getElementById('refresh-emoji').addEventListener('click', () => fetchEmoji());
+    document.getElementById('refresh-emoji-btn').addEventListener('click', () => fetchEmoji());
 
+    // Food
+    document.getElementById('refresh-food').addEventListener('click', () => fetchFood());
+    document.getElementById('refresh-food-btn').addEventListener('click', () => fetchFood());
+}
+
+function refreshIcons() {
+    if (window.lucide) window.lucide.createIcons();
+}
+
+// --- API Helpers ---
+
+async function apiFetch(name, url, options = {}) {
     try {
         const response = await fetch(url, options);
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
-        }
-        
-        if (isBlob) {
-            return await response.blob();
-        }
+        if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
         return await response.json();
     } catch (error) {
-        console.error(`Error fetching for ${cardId}:`, error);
-        errorMsg.textContent = `Error: ${error.message}`;
-        errorMsg.classList.remove('hidden');
-        return null;
-    } finally {
-        loader.classList.add('hidden');
-        outputElement.style.opacity = '1';
+        console.error(`Error [${name}]:`, error);
+        return { error: error.message || 'Connection failed' };
     }
 }
 
 /**
- * Handles copy-to-clipboard functionality
+ * Replaces card content with an error message
  */
-function copyToClipboard(elementId) {
-    const element = document.getElementById(elementId);
-    if (!element) return;
-    const textToCopy = element.value || element.textContent;
-    navigator.clipboard.writeText(textToCopy).then(() => {
-        alert('URL copied to clipboard!');
-    }).catch(err => {
-        console.error('Failed to copy: ', err);
-    });
+function displayCardError(name, message) {
+    const container = document.getElementById(`${name}-card`);
+    if (!container) return;
+    
+    const content = container.querySelector('.card-content');
+    content.innerHTML = `
+        <div class="error-state small animate-in">
+            <i data-lucide="alert-circle"></i>
+            <p>${message}</p>
+            <button class="btn btn-secondary btn-sm mt-1" onclick="location.reload()">Retry Card</button>
+        </div>
+    `;
+    refreshIcons();
 }
 
-// --- API SPECIFIC HANDLERS ---
+// --- API Functions ---
 
-/**
- * 1. Dog Finder
- */
-async function getDog() {
-    const cardId = 'dog';
-    const data = await fetchData('https://dog.ceo/api/breeds/image/random', cardId);
-    if (data && data.status === 'success') {
-        const imageUrl = data.message;
-        const breedPart = imageUrl.split('/')[4];
-        const breedName = breedPart.replace('-', ' ').toUpperCase();
-        const output = document.getElementById(`${cardId}-output`);
-        output.innerHTML = `
-            <div class="fade-in">
-                <div class="img-container"><img src="${imageUrl}" alt="Random Dog"></div>
-                <h3>${breedName}</h3>
-                <input type="hidden" id="dog-img-url" value="${imageUrl}">
-            </div>`;
-        const copyBtn = document.getElementById('copy-dog');
-        if (copyBtn) copyBtn.classList.remove('hidden');
+async function fetchDog() {
+    const container = document.getElementById('dog-image-container');
+    const breedEl = document.getElementById('dog-breed');
+    container.innerHTML = '<div class="skeleton"></div>';
+    
+    const data = await apiFetch('dog', API_URLS.dog);
+    if (data.error) {
+        displayCardError('dog', data.error);
+        return;
     }
+
+    const breedMatch = data.message.match(/breeds\/([^/]+)\//);
+    const breed = breedMatch ? formatBreedName(breedMatch[1]) : 'Random Breed';
+
+    const img = new Image();
+    img.src = data.message;
+    img.onload = () => {
+        container.innerHTML = '';
+        container.appendChild(img);
+        breedEl.innerText = breed;
+    };
+    img.onerror = () => displayCardError('dog', 'Failed to load image');
 }
 
-/**
- * 2. QR Code Generator (API Ninjas)
- */
-async function generateQRCode() {
-    const cardId = 'qrcode';
-    const qrInput = document.getElementById('qrcode-input');
-    const qrData = qrInput.value || 'https://api-ninjas.com';
-    const encodedData = encodeURIComponent(qrData);
+function formatBreedName(breedStr) {
+    return breedStr.split('-').reverse().map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
 
-    const url = `https://api.api-ninjas.com/v1/qrcode?data=${encodedData}&format=png`;
-    const options = {
-        headers: { 
-            'X-Api-Key': API_CONFIG.NINJAS_API_KEY, 
-            'Accept': 'image/png' 
-        }
+async function copyDogURL() {
+    const img = document.querySelector('#dog-image-container img');
+    if (!img) return;
+    try {
+        await navigator.clipboard.writeText(img.src);
+        const btn = document.getElementById('copy-dog-url');
+        const old = btn.innerHTML;
+        btn.innerHTML = '<i data-lucide="check"></i> Copied';
+        setTimeout(() => { btn.innerHTML = old; refreshIcons(); }, 2000);
+    } catch (e) {
+        alert('Failed to copy');
+    }
+    refreshIcons();
+}
+
+async function fetchJoke() {
+    const setupEl = document.getElementById('joke-setup');
+    const punchlineEl = document.getElementById('joke-punchline');
+    setupEl.innerText = 'Consulting the comedy gods...';
+    punchlineEl.classList.add('hidden');
+
+    const data = await apiFetch('joke', API_URLS.joke);
+    if (data.error) {
+        displayCardError('joke', data.error);
+        return;
+    }
+
+    if (data.type === 'single') {
+        setupEl.innerText = data.joke;
+        punchlineEl.innerText = 'Enjoy!';
+    } else {
+        setupEl.innerText = data.setup;
+        punchlineEl.innerText = data.delivery;
+    }
+    setTimeout(() => punchlineEl.classList.remove('hidden'), 1000);
+}
+
+async function fetchUser() {
+    const nameEl = document.getElementById('user-name');
+    const avatarEl = document.getElementById('user-avatar');
+    const skeleton = avatarEl.parentElement.querySelector('.skeleton');
+    
+    avatarEl.classList.add('hidden');
+    skeleton.classList.remove('hidden');
+
+    const data = await apiFetch('user', API_URLS.user);
+    if (data.error) {
+        displayCardError('user', data.error);
+        return;
+    }
+
+    const user = data.results[0];
+    avatarEl.src = user.picture.large;
+    avatarEl.onload = () => {
+        avatarEl.classList.remove('hidden');
+        skeleton.classList.add('hidden');
     };
 
-    const blob = await fetchData(url, cardId, options, true);
-    if (blob) {
-        const imageUrl = URL.createObjectURL(blob);
-        const output = document.getElementById(`${cardId}-output`);
-        output.innerHTML = `
-            <div class="fade-in">
-                <div class="img-container">
-                    <img src="${imageUrl}" alt="QR Code">
-                </div>
-                <input type="hidden" id="qrcode-img-url" value="${imageUrl}">
-            </div>`;
-        const copyBtn = document.getElementById('copy-qrcode');
-        if (copyBtn) copyBtn.classList.remove('hidden');
-    }
+    nameEl.innerText = `${user.name.first} ${user.name.last}`;
+    document.getElementById('user-email').innerText = user.email;
+    document.getElementById('user-location').innerText = `${user.location.city}, ${user.location.country}`;
+    document.getElementById('user-phone').innerText = user.phone;
+    document.getElementById('user-age').innerText = `${user.dob.age} years old`;
 }
 
-/**
- * 3. Random User Profile
- */
-async function getUser() {
-    const cardId = 'user';
-    const data = await fetchData('https://randomuser.me/api/', cardId);
-    if (data && data.results && data.results.length > 0) {
-        const user = data.results[0];
-        const output = document.getElementById(`${cardId}-output`);
-        output.innerHTML = `
-            <div class="fade-in profile-card">
-                <img src="${user.picture.large}" alt="user headshot">
-                <div class="profile-info">
-                    <p><strong>Name:</strong> ${user.name.first} ${user.name.last}</p>
-                    <p><strong>Email:</strong> ${user.email}</p>
-                    <p><strong>Phone:</strong> ${user.phone}</p>
-                    <p><strong>Age:</strong> ${user.dob.age}</p>
-                    <p><strong>Country:</strong> ${user.location.country}</p>
-                </div>
-            </div>`;
+async function fetchAnime() {
+    const titleEl = document.getElementById('anime-title');
+    const synopsisEl = document.getElementById('anime-synopsis');
+    const scoreEl = document.getElementById('anime-score');
+    const typeEl = document.getElementById('anime-type');
+    const container = document.getElementById('anime-poster-container');
+    
+    container.innerHTML = '<div class="skeleton"></div>';
+    
+    // Set initial loading state
+    titleEl.innerText = 'Seeking epic tales...';
+    titleEl.classList.add('skeleton-text');
+    synopsisEl.innerText = 'Consulting the scrolls...';
+    synopsisEl.classList.add('skeleton-text');
+
+    const data = await apiFetch('anime', API_URLS.anime);
+    if (data.error) {
+        displayCardError('anime', data.error);
+        return;
     }
-}
 
-/**
- * 4. Joke Generator (Official Joke API)
- */
-async function getJoke() {
-    const cardId = 'joke';
-    const data = await fetchData('https://official-joke-api.appspot.com/random_joke', cardId);
-    if (data) {
-        const output = document.getElementById(`${cardId}-output`);
-        output.innerHTML = `
-            <div class="fade-in joke-container">
-                <p style="font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem;">${data.setup}</p>
-                <p style="color: var(--primary); font-weight: 700; font-size: 1.25rem;">${data.punchline}</p>
-            </div>`;
-    }
-}
+    const anime = data.data;
+    
+    // Update Title
+    titleEl.innerText = anime.title;
+    titleEl.classList.remove('skeleton-text');
+    
+    // Update Synopsis
+    let synopsis = anime.synopsis || "No description available for this anime.";
+    synopsis = synopsis.split('[Written by')[0].trim();
+    synopsisEl.innerText = synopsis;
+    synopsisEl.classList.remove('skeleton-text');
 
-/**
- * 5. Emoji Finder (API Ninjas)
- */
-async function getEmoji() {
-    const cardId = 'emoji';
-    const emojiInput = document.getElementById('emoji-input');
-    const emojiName = emojiInput.value || 'smile';
+    // Update Badges
+    scoreEl.innerHTML = `<i data-lucide="star"></i> ${anime.score || 'N/A'}`;
+    typeEl.innerHTML = `<i data-lucide="monitor"></i> ${anime.type || 'N/A'}`;
 
-    const url = `https://api.api-ninjas.com/v1/emoji?name=${emojiName}`;
-    const options = {
-        headers: { 'X-Api-Key': API_CONFIG.NINJAS_API_KEY }
+    const img = new Image();
+    img.src = anime.images.jpg.large_image_url;
+    img.onload = () => {
+        container.innerHTML = '';
+        container.appendChild(img);
+        refreshIcons();
     };
-
-    const data = await fetchData(url, cardId, options);
-    if (data && data.length > 0) {
-        const emoji = data[0];
-        const output = document.getElementById(`${cardId}-output`);
-        output.innerHTML = `
-            <div class="fade-in" style="text-align: center;">
-                <div style="font-size: 5rem; margin-bottom: 1rem;">${emoji.character}</div>
-                <h3 style="color: var(--primary); text-transform: uppercase;">${emoji.name}</h3>
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Unicode: ${emoji.code}</p>
-            </div>`;
-    } else if (data && data.length === 0) {
-        const errorMsg = document.querySelector(`#${cardId}-card .error-msg`);
-        errorMsg.textContent = "No emoji found with that name.";
-        errorMsg.classList.remove('hidden');
-    }
+    img.onerror = () => displayCardError('anime', 'Poster not found');
 }
 
-/**
- * 6. Animal Finder (API Ninjas)
- */
-async function getAnimal() {
-    const cardId = 'animal';
-    const animalInput = document.getElementById('animal-input');
-    const animalName = animalInput.value || 'Cheetah';
+async function fetchEmoji() {
+    const displayEl = document.getElementById('emoji-display');
+    const nameEl = document.getElementById('emoji-name');
+    const groupEl = document.getElementById('emoji-group');
+    
+    displayEl.innerHTML = '...';
+    displayEl.classList.remove('pop');
+    nameEl.classList.add('skeleton-text');
+    nameEl.innerText = 'Loading...';
 
-    const url = `https://api.api-ninjas.com/v1/animals?name=${animalName}`;
-    const options = {
-        headers: { 'X-Api-Key': API_CONFIG.NINJAS_API_KEY }
-    };
-
-    const data = await fetchData(url, cardId, options);
-    if (data && data.length > 0) {
-        const animal = data[0];
-        const output = document.getElementById(`${cardId}-output`);
-        output.innerHTML = `
-            <div class="fade-in" style="text-align: left;">
-                <h3 style="color: var(--primary); text-transform: uppercase; margin-bottom: 1rem;">${animal.name}</h3>
-                <div class="profile-info">
-                    <p><strong>Scientific Name:</strong> ${animal.taxonomy.scientific_name}</p>
-                    <p><strong>Habitat:</strong> ${animal.characteristics.habitat || 'N/A'}</p>
-                    <p><strong>Diet:</strong> ${animal.characteristics.diet || 'N/A'}</p>
-                    <p><strong>Location:</strong> ${animal.locations.join(', ')}</p>
-                    <p style="margin-top: 0.5rem; font-style: italic;">"${animal.characteristics.slogan || ''}"</p>
-                </div>
-            </div>`;
-    } else if (data && data.length === 0) {
-        const errorMsg = document.querySelector(`#${cardId}-card .error-msg`);
-        errorMsg.textContent = "No animals found with that name.";
-        errorMsg.classList.remove('hidden');
+    const data = await apiFetch('emoji', API_URLS.emoji);
+    if (data.error) {
+        displayCardError('emoji', data.error);
+        return;
     }
+
+    // Force animation restart
+    void displayEl.offsetWidth; 
+    
+    displayEl.innerHTML = data.htmlCode.join('');
+    displayEl.classList.add('pop');
+    
+    nameEl.innerText = data.name;
+    nameEl.classList.remove('skeleton-text');
+    
+    groupEl.innerText = `${data.category} / ${data.group}`;
+}
+
+async function fetchFood() {
+    const container = document.getElementById('food-image-container');
+    const categoryEl = document.getElementById('food-category');
+    container.innerHTML = '<div class="skeleton"></div>';
+    categoryEl.innerText = 'Gourmet in progress...';
+    categoryEl.classList.add('skeleton-text');
+
+    const data = await apiFetch('food', API_URLS.food);
+    if (data.error) {
+        displayCardError('food', data.error);
+        return;
+    }
+
+    // Extract category from URL: https://foodish-api.com/images/pizza/pizza12.jpg -> pizza
+    const categoryMatch = data.image.match(/images\/([^/]+)\//);
+    const category = categoryMatch ? categoryMatch[1].charAt(0).toUpperCase() + categoryMatch[1].slice(1) : 'Gourmet Dish';
+
+    const img = new Image();
+    img.src = data.image;
+    img.onload = () => {
+        container.innerHTML = '';
+        container.appendChild(img);
+        categoryEl.innerText = category;
+        categoryEl.classList.remove('skeleton-text');
+    };
+    img.onerror = () => displayCardError('food', 'Failed to load gourmet image');
 }

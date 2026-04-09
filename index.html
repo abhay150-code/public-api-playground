@@ -4,136 +4,188 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Public API Playground</title>
+    <meta name="description" content="A simple, minimalistic explorer for testing public APIs.">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Public API Playground</h1>
-            <p>Explore and test multiple public APIs with just a click!</p>
-        </div>
-    </header>
-
     <main class="container">
-        <div class="api-grid">
-            <!-- Card 1: Dog Finder -->
-            <section class="api-card" id="dog-card">
+        <header class="header animate-in">
+            <h1 class="title">API Playground</h1>
+            <p class="subtitle">A simple explorer for the world's random data.</p>
+        </header>
+
+        <div class="grid">
+            <!-- Dog API Card -->
+            <section class="card animate-in" id="dog-card">
                 <div class="card-header">
-                    <h2>Dog Finder</h2>
+                    <div class="card-icon-title">
+                        <i data-lucide="dog"></i>
+                        <h2>Random Dog</h2>
+                    </div>
+                    <button class="btn-icon" id="refresh-dog" title="Refresh">
+                        <i data-lucide="rotate-cw"></i>
+                    </button>
                 </div>
-                <div class="card-body">
-                    <div id="dog-output" class="output-area">
-                        <p class="placeholder">Click "Get Dog" to see a furry friend!</p>
+                <div class="card-content">
+                    <div class="image-container" id="dog-image-container">
+                        <div class="skeleton"></div>
+                    </div>
+                    <div class="breed-badge" id="dog-breed">Unknown Breed</div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-secondary" id="copy-dog-url">
+                        <i data-lucide="copy"></i> Copy URL
+                    </button>
+                </div>
+            </section>
+
+            <!-- Joke API Card -->
+            <section class="card animate-in" id="joke-card">
+                <div class="card-header">
+                    <div class="card-icon-title">
+                        <i data-lucide="laugh"></i>
+                        <h2>Daily Joke</h2>
+                    </div>
+                </div>
+                <div class="card-content joke-content">
+                    <div id="joke-container">
+                        <p class="joke-setup" id="joke-setup">Loading...</p>
+                        <p class="joke-punchline" id="joke-punchline">...</p>
                     </div>
                 </div>
                 <div class="card-footer">
-                    <button class="btn primary" onclick="getDog()">Get Dog</button>
-                    <button id="copy-dog" class="btn secondary hidden" onclick="copyToClipboard('dog-img-url')">Copy URL</button>
+                    <button class="btn btn-primary" id="refresh-joke">
+                        <i data-lucide="sparkles"></i> Next Joke
+                    </button>
                 </div>
-                <div class="loader hidden"></div>
-                <div class="error-msg hidden"></div>
             </section>
 
-            <!-- Card 2: QR Code Generator (API Ninjas) -->
-            <section class="api-card" id="qrcode-card">
+            <!-- User API Card -->
+            <section class="card animate-in" id="user-card">
                 <div class="card-header">
-                    <h2>QR Code Generator</h2>
+                    <div class="card-icon-title">
+                        <i data-lucide="users"></i>
+                        <h2>Random User</h2>
+                    </div>
+                    <button class="btn-icon" id="refresh-user" title="Refresh">
+                        <i data-lucide="rotate-cw"></i>
+                    </button>
                 </div>
-                <div class="card-body">
-                    <div id="qrcode-output" class="output-area">
-                        <p class="placeholder">Enter text or URL to generate a QR.</p>
+                <div class="card-content">
+                    <div class="user-profile">
+                        <div class="user-avatar-container">
+                            <img src="" alt="" id="user-avatar" class="hidden">
+                            <div class="skeleton" style="width: 100%; height: 100%; border-radius: 50%;"></div>
+                        </div>
+                        <div class="user-info">
+                            <h3 id="user-name">Loading...</h3>
+                            <p id="user-email">email@example.com</p>
+                        </div>
+                    </div>
+                    <ul class="user-details">
+                        <li><i data-lucide="map-pin"></i> <span id="user-location">Location</span></li>
+                        <li><i data-lucide="phone"></i> <span id="user-phone">Phone</span></li>
+                        <li><i data-lucide="calendar"></i> <span id="user-age">Age</span></li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary" id="refresh-user-btn">
+                        New User
+                    </button>
+                </div>
+            </section>
+
+            <!-- Anime API Card -->
+            <section class="card animate-in" id="anime-card">
+                <div class="card-header">
+                    <div class="card-icon-title">
+                        <i data-lucide="tv"></i>
+                        <h2>Random Anime</h2>
+                    </div>
+                    <button class="btn-icon" id="refresh-anime" title="Refresh">
+                        <i data-lucide="rotate-cw"></i>
+                    </button>
+                </div>
+                <div class="card-content">
+                    <div class="image-container" id="anime-poster-container">
+                        <div class="skeleton"></div>
+                    </div>
+                    <div class="anime-info">
+                        <h3 id="anime-title">Loading Title...</h3>
+                        <p id="anime-synopsis" class="text-secondary small">Description goes here...</p>
+                        <div class="anime-stats">
+                            <span class="badge" id="anime-score"><i data-lucide="star"></i> Score</span>
+                            <span class="badge" id="anime-type"><i data-lucide="monitor"></i> Type</span>
+                        </div>
                     </div>
                 </div>
-                <div class="card-footer-ai">
-                    <input type="text" id="qrcode-input" placeholder="Enter URL or text..." class="prompt-input">
-                    <button class="btn primary" onclick="generateQRCode()">Generate QR</button>
-                    <button id="copy-qrcode" class="btn secondary hidden" onclick="copyToClipboard('qrcode-img-url')">Copy URL</button>
-                </div>
-                <div class="loader hidden"></div>
-                <div class="error-msg hidden"></div>
             </section>
 
-            <!-- Card 3: Random User Profile -->
-            <section class="api-card" id="user-card">
+            <!-- Emoji API Card -->
+            <section class="card animate-in" id="emoji-card">
                 <div class="card-header">
-                    <h2>Random User Profile</h2>
+                    <div class="card-icon-title">
+                        <i data-lucide="smile"></i>
+                        <h2>Random Emoji</h2>
+                    </div>
+                    <button class="btn-icon" id="refresh-emoji" title="Refresh">
+                        <i data-lucide="rotate-cw"></i>
+                    </button>
                 </div>
-                <div class="card-body">
-                    <div id="user-output" class="output-area">
-                        <p class="placeholder">Generate a random persona.</p>
+                <div class="card-content">
+                    <div class="emoji-display-container">
+                        <div id="emoji-display" class="emoji-display">?</div>
+                    </div>
+                    <div class="emoji-info">
+                        <h3 id="emoji-name">Emoji Name</h3>
+                        <p id="emoji-group" class="text-secondary small">Category</p>
                     </div>
                 </div>
                 <div class="card-footer">
-                    <button class="btn primary" onclick="getUser()">Get User</button>
+                    <button class="btn btn-primary" id="refresh-emoji-btn">
+                        Get Emoji
+                    </button>
                 </div>
-                <div class="loader hidden"></div>
-                <div class="error-msg hidden"></div>
             </section>
 
-            <!-- Card 4: Joke Generator -->
-            <section class="api-card" id="joke-card">
+            <!-- Food API Card -->
+            <section class="card animate-in" id="food-card">
                 <div class="card-header">
-                    <h2>Joke Generator</h2>
+                    <div class="card-icon-title">
+                        <i data-lucide="utensils"></i>
+                        <h2>Random Food</h2>
+                    </div>
+                    <button class="btn-icon" id="refresh-food" title="Refresh">
+                        <i data-lucide="rotate-cw"></i>
+                    </button>
                 </div>
-                <div class="card-body">
-                    <div id="joke-output" class="output-area">
-                        <p class="placeholder">Need a laugh?</p>
+                <div class="card-content">
+                    <div class="image-container" id="food-image-container">
+                        <div class="skeleton"></div>
+                    </div>
+                    <div class="food-info">
+                        <h3 id="food-category">Gourmet Dish</h3>
                     </div>
                 </div>
                 <div class="card-footer">
-                    <button class="btn primary" onclick="getJoke()">Get Joke</button>
+                    <button class="btn btn-primary" id="refresh-food-btn">
+                        Get Random Dish
+                    </button>
                 </div>
-                <div class="loader hidden"></div>
-                <div class="error-msg hidden"></div>
-            </section>
-
-            <!-- Card 5: Emoji Finder (API Ninjas) -->
-            <section class="api-card" id="emoji-card">
-                <div class="card-header">
-                    <h2>Emoji Finder</h2>
-                </div>
-                <div class="card-body">
-                    <div id="emoji-output" class="output-area">
-                        <p class="placeholder">Search for an emoji.</p>
-                    </div>
-                </div>
-                <div class="card-footer-ai">
-                    <input type="text" id="emoji-input" placeholder="smile, happy, heart..." class="prompt-input">
-                    <button class="btn primary" onclick="getEmoji()">Search Emoji</button>
-                </div>
-                <div class="loader hidden"></div>
-                <div class="error-msg hidden"></div>
-            </section>
-
-            <!-- Card 6: Animal Finder (API Ninjas) -->
-            <section class="api-card" id="animal-card">
-                <div class="card-header">
-                    <h2>Animal Finder</h2>
-                </div>
-                <div class="card-body">
-                    <div id="animal-output" class="output-area">
-                        <p class="placeholder">Learn about any animal!</p>
-                    </div>
-                </div>
-                <div class="card-footer-ai">
-                    <input type="text" id="animal-input" placeholder="Enter animal name (e.g. Cheetah)" class="prompt-input">
-                    <button class="btn primary" onclick="getAnimal()">Search Animal</button>
-                </div>
-                <div class="loader hidden"></div>
-                <div class="error-msg hidden"></div>
             </section>
         </div>
     </main>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 Public API Playground. Built with HTML, CSS, and Vanilla JS.</p>
-        </div>
+    <footer class="main-footer">
+        <p>&copy; 2024 API Playground. Built with <i data-lucide="heart" class="heart-icon"></i></p>
     </footer>
 
-    <!-- Local configuration for development (Ignored by Git) -->
-    <script src="config-local.js"></script>
     <script src="script.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            if (window.lucide) window.lucide.createIcons();
+        });
+    </script>
 </body>
 </html>
